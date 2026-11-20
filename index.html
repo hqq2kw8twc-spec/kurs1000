@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Курс на 1000">
+<meta name="theme-color" content="#0B6E78">
+<style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px)}body{margin:0}</style>
+<title>Курс на 1000</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Концепт: мягкое приложение привычек. Тёмная градиентная шапка с одометром и кольцом, полоса дней, крупные карточки, плавающая панель вкладок. */
+:root {
+  --bg: #F3F4F8;
+  --surface: #FFFFFF;
+  --surface2: #EBEDF3;
+  --ink: #14161F;
+  --muted: #666B7C;
+  --line: #E1E4EC;
+  --line2: #C3C8D4;
+  --accent: #E8503A;
+  --accent-ink: #FFFFFF;
+  --ok: #138A5B;
+  --signal: #A5610A;
+  --hero-a: #1A2850;
+  --hero-b: #0E6B66;
+  --hero-ink: #FFFFFF;
+  --tabbg: rgba(255,255,255,.86);
+  --shadow: 0 1px 2px rgba(20,22,31,.05), 0 8px 22px rgba(20,22,31,.06);
+  --font-display: 'Unbounded', 'Arial Black', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B0D14; --surface: #151823; --surface2: #1F2331; --ink: #F2F3F8; --muted: #9AA0B4;
+    --line: #262A3A; --line2: #3A4055; --accent: #FF7A59; --accent-ink: #1C0A05; --ok: #52D69A; --signal: #F0B33C;
+    --hero-a: #1B2A5A; --hero-b: #0D6E6A; --tabbg: rgba(21,24,35,.88);
+    --shadow: 0 0 0 1px #262A3A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B0D14; --surface: #151823; --surface2: #1F2331; --ink: #F2F3F8; --muted: #9AA0B4;
+  --line: #262A3A; --line2: #3A4055; --accent: #FF7A59; --accent-ink: #1C0A05; --ok: #52D69A; --signal: #F0B33C;
+  --hero-a: #1B2A5A; --hero-b: #0D6E6A; --tabbg: rgba(21,24,35,.88);
+  --shadow: 0 0 0 1px #262A3A;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 16px/1.5 var(--font-body);
+  padding-block: 18px 128px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent;
+}
+.wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h2 { font-weight: 800; font-size: 24px; line-height: 1.2; letter-spacing: -0.02em; }
+h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); font-weight: 800; }
+p { margin: 0; }
+a { color: var(--accent); }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+
+/* шапка */
+.hero {
+  position: relative; overflow: hidden; color: var(--hero-ink);
+  background: linear-gradient(140deg, var(--hero-a) 0%, var(--hero-b) 100%);
+  border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 16px;
+}
+.hero::after {
+  content: ""; position: absolute; right: -50px; top: -60px; width: 190px; height: 190px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.18), transparent 66%); pointer-events: none;
+}
+.hero-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; position: relative; z-index: 1; }
+.hero-label { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; opacity: .85; }
+.hchip { font-size: 13px; font-weight: 800; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,.16); white-space: nowrap; }
+.hero-main { display: flex; align-items: center; justify-content: space-between; gap: 14px; position: relative; z-index: 1; }
+.digits { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.dg {
+  font-family: var(--font-display); font-weight: 600; font-size: 40px; line-height: 1;
+  background: rgba(255,255,255,.14); border-radius: 14px; padding: 12px 11px 10px; font-variant-numeric: tabular-nums;
+}
+.digits .unit { font-weight: 800; margin-left: 8px; font-size: 15px; opacity: .85; }
+.ring { position: relative; width: 74px; height: 74px; flex: none; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 4.5; }
+.ring .rt { stroke: rgba(255,255,255,.22); }
+.ring .rf { stroke: var(--hero-ink); stroke-linecap: round; }
+@media (prefers-reduced-motion: no-preference) { .ring .rf { transition: stroke-dashoffset .35s ease; } }
+.ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.chip {
+  display: inline-flex; align-items: center; font-size: 13px; font-weight: 800; padding: 5px 12px; border-radius: 999px;
+  background: var(--surface2); color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.chip.accent { background: var(--accent); color: var(--accent-ink); }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.card { background: var(--surface); box-shadow: var(--shadow); border-radius: 22px; padding: 18px; }
+.card.flat { border-radius: 16px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+
+/* полоса дней */
+.days { position: relative; display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px; margin: 0 -2px; scrollbar-width: none; scroll-snap-type: x proximity; }
+.days::-webkit-scrollbar { display: none; }
+.dchip {
+  flex: none; width: 54px; height: 70px; border-radius: 18px; background: var(--surface); box-shadow: var(--shadow);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  text-decoration: none; color: var(--ink); position: relative; scroll-snap-align: center;
+}
+.dchip small { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+.dchip b { font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.dchip.on { background: var(--accent); color: var(--accent-ink); }
+.dchip.on small { color: inherit; opacity: .85; }
+.dchip.done::after { content: ""; position: absolute; bottom: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
+.dchip.on.done::after { background: var(--accent-ink); }
+.daytitle { display: flex; flex-direction: column; gap: 6px; }
+.daytitle .date { font-size: 13px; color: var(--muted); font-weight: 700; text-transform: capitalize; }
+
+/* задачи */
+.tasks { display: flex; flex-direction: column; gap: 10px; }
+.task {
+  display: flex; gap: 14px; align-items: flex-start; padding: 16px; min-height: 68px;
+  background: var(--surface); box-shadow: var(--shadow); border-radius: 20px; cursor: pointer;
+}
+.task input {
+  -webkit-appearance: none; appearance: none; flex: none; margin: 2px 0 0; width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--line2); background: transparent; display: grid; place-items: center; cursor: pointer;
+}
+.task input:checked { background: var(--accent); border-color: var(--accent); }
+.task input:checked::after { content: ""; width: 7px; height: 13px; border: solid var(--accent-ink); border-width: 0 3px 3px 0; transform: translateY(-1px) rotate(45deg); }
+.task .txt { min-width: 0; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.task .tag { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, currentColor 14%, transparent); }
+.tag.v { color: var(--accent); } .tag.s { color: var(--signal); } .tag.g { color: var(--ok); } .tag.m { color: var(--muted); }
+.task .body { overflow-wrap: anywhere; font-weight: 600; }
+.task.done { opacity: .6; }
+.task.done .body { text-decoration: line-through; }
+
+/* карточки видео */
+.vidlink {
+  display: flex; align-items: center; gap: 14px; text-decoration: none; color: var(--ink);
+  padding: 12px 14px 12px 12px; border-radius: 22px; background: var(--surface); box-shadow: var(--shadow); min-height: 76px;
+}
+.vidlink .vn {
+  flex: none; width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--hero-ink);
+  background: linear-gradient(140deg, var(--hero-a), var(--hero-b));
+}
+.vidlink.k1 .vn { background: linear-gradient(140deg, #E8503A, #F59E0B); }
+.vidlink.k2 .vn { background: linear-gradient(140deg, #0E6B66, #22A6A0); }
+.vidlink .t { min-width: 0; flex: 1; }
+.vidlink .t b { display: block; font-weight: 800; overflow-wrap: anywhere; line-height: 1.3; }
+.vidlink .t span { font-size: 13px; color: var(--muted); font-weight: 600; }
+.vidlink .go { color: var(--muted); font-size: 22px; }
+.dots { display: flex; gap: 4px; flex: none; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--surface2); box-shadow: inset 0 0 0 1px var(--line2); }
+.dots i.on { background: var(--ok); box-shadow: none; }
+
+/* страница видео */
+.back { text-decoration: none; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; min-height: 36px; }
+.statuses { display: flex; flex-wrap: wrap; gap: 8px; }
+.statuses label {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 16px;
+  background: var(--surface); box-shadow: var(--shadow); border-radius: 999px; font-weight: 700; font-size: 14px; cursor: pointer;
+}
+.statuses input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0; }
+.sec h3 { margin-bottom: 10px; }
+.hook { font-size: 20px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; letter-spacing: -0.01em; }
+.script { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.script li { display: grid; grid-template-columns: 62px 1fr; gap: 10px; }
+.script .tc { font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding-top: 4px; font-weight: 500; }
+.script .tx { overflow-wrap: anywhere; min-width: 0; }
+.list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
+.list li { overflow-wrap: anywhere; }
+.btn {
+  min-height: 48px; padding: 0 20px; border-radius: 14px; border: 0; background: var(--accent); color: var(--accent-ink);
+  font: 800 15px var(--font-body); cursor: pointer; margin-top: 14px;
+}
+.btn.ghost { background: var(--surface2); color: var(--ink); }
+.coverbox {
+  border-radius: 18px; padding: 18px; color: var(--hero-ink);
+  background: linear-gradient(140deg, var(--hero-a), var(--hero-b));
+}
+.coverbox .big { font-family: var(--font-display); font-weight: 600; font-size: 24px; line-height: 1.15; margin-bottom: 8px; overflow-wrap: anywhere; }
+.coverbox .muted { color: inherit; opacity: .85; }
+details.card summary { cursor: pointer; font-weight: 800; min-height: 32px; display: flex; align-items: center; }
+details.card[open] summary { margin-bottom: 12px; }
+
+/* прогресс */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stat { background: var(--surface); box-shadow: var(--shadow); border-radius: 20px; padding: 14px 12px; min-width: 0; }
+.stat b { display: block; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); font-weight: 700; }
+.phase { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+.phase:first-of-type { border-top: 0; padding-top: 4px; }
+.phase .pd { font-size: 12px; color: var(--muted); width: 92px; flex: none; padding-top: 3px; font-weight: 700; }
+.phase .pn { font-weight: 800; }
+.phase.now .pn { color: var(--accent); }
+.viewrow { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.viewrow:first-of-type { border-top: 0; }
+.viewrow .vt { flex: 1; min-width: 0; font-size: 14px; overflow-wrap: anywhere; }
+.viewrow input {
+  width: 100px; min-height: 46px; border-radius: 14px; border: 0; background: var(--surface2); color: var(--ink);
+  font: 700 16px var(--font-body); padding: 0 12px; text-align: right;
+}
+
+/* панель вкладок */
+nav.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; pointer-events: none;
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+nav.tabs .in {
+  pointer-events: auto; max-width: 420px; margin: 0 auto; padding: 6px; border-radius: 28px;
+  background: var(--tabbg); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  box-shadow: 0 8px 28px rgba(0,0,0,.18), 0 0 0 1px var(--line);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+}
+nav.tabs a {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 54px;
+  text-decoration: none; color: var(--muted); font-size: 12px; font-weight: 800; border-radius: 22px;
+}
+nav.tabs a svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+nav.tabs a.on { background: var(--accent); color: var(--accent-ink); }
+@media (max-width: 380px) { .dg { font-size: 32px; padding: 10px 9px 8px; } .script li { grid-template-columns: 52px 1fr; } .ring { width: 64px; height: 64px; } }
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav class="tabs" aria-label="Разделы"><div class="in" id="tabs"></div></nav>
+
+<script>
+(function () {
+  'use strict';
+  var DAY = 86400000;
+  var START = Date.UTC(2026, 10, 21);
+  var GOAL = Date.UTC(2027, 2, 1);
+  var PLAN_DAYS = 14;
+  var TAGS = { v: 'Видео', s: 'Навык', g: 'Рост', m: 'Деньги' };
+
+  var MONTAGE_BASE = [
+    'Проект в CapCut: вертикаль 9:16 (1080×1920). Видео с камеры поставь по центру и кадрируй так, чтобы лицо было в верхней половине экрана.',
+    'Вырежи паузы и слова-паразиты. Остаётся только плотная речь без воды.',
+    'Автосубтитры: крупный шрифт, максимум 2 строки, по центру экрана. Нижние 20% не занимай, там кнопки TikTok.',
+    'Смена кадра или зум 105-110% каждые 3-4 секунды, чтобы картинка не стояла.',
+    'Музыка из библиотеки CapCut или TikTok, громкость 10-15%, голос на 100%.',
+    'Первые 3 секунды: сразу хук, без заставки и приветствий. Последняя секунда: призыв.',
+    'Экспорт: 1080p, 25-30 к/с. Для Reels и Shorts выгружай тот же файл без водяного знака.'
+  ];
+
+  var VIDEOS = [
+    {
+      id: 1, fmt: 'Машина, ночь', title: '100 дней до $1000: начинаю', post: 2, time: '20:00', len: '25-30 с',
+      idea: 'Первое видео серии. Говоришь цель, показываешь, что будет дальше. Никакого продажного тона.',
+      hook: '100 дней. Тысяча долларов в месяц. Снимаю всё.',
+      script: [
+        ['0-3 с', '100 дней. Тысяча долларов в месяц. Снимаю всё.'],
+        ['3-10 с', 'План простой. Каждый день одна задача для видео и одна для себя. Вместо рилсов делаю дело.'],
+        ['10-20 с', 'Из техники у меня камера, микрофон и машина. Из опыта ноль. Так что смотри, как я ошибаюсь.'],
+        ['20-28 с', 'Завтра расскажу, почему мозгу так нравится галочка. Подпишись, чтобы не пропустить.']
+      ],
+      shots: [
+        'Говорящий кадр: Sony на штативе или на торпеде, чуть сбоку и ниже уровня глаз, кадр по грудь. Машина на стоянке.',
+        'Свет: салонную лампу на минимум, телефон с белым экраном лежит на коленях и подсвечивает лицо снизу.',
+        'Крупно: руки на руле, 3 секунды.',
+        'Вид через лобовое на огни дороги: камера закреплена, фокус на фонарях, 4 секунды.',
+        'Финал: поворот ключа, завод двигателя. Снимай на стоянке.'
+      ],
+      cover: { text: '100 ДНЕЙ', frame: 'Лицо наполовину в свете, тёмный фон, взгляд в объектив. Мелко ниже: $1000.' },
+      montage: ['Субтитры жёлтым или белым цветом без рамки. Один и тот же стиль субтитров на всю серию.'],
+      caption: 'День 0. Цель: 1000 долларов в месяц к 01.03.2027. Показываю всё без фильтров.',
+      tags: '#100дней #цель #влог #беларусь #саморазвитие'
+    },
+    {
+      id: 2, fmt: 'Машина, ночь', title: 'Почему мозгу нравится галочка', post: 3, time: '22:00', len: '30-35 с',
+      idea: 'Объясняешь идею из того видео, которое ты посмотрел, и показываешь приложение. Завершение: просишь написать «хочу» в комментариях.',
+      hook: 'Мозг любит, когда ты закрываешь задачу. И этим можно пользоваться.',
+      script: [
+        ['0-3 с', 'Мозг любит, когда ты закрываешь задачу. И этим можно пользоваться.'],
+        ['3-12 с', 'Я посмотрел видео про это и сделал себе приложение. Каждый день 4 задачи. Сделал, ставлю галочку.'],
+        ['12-25 с', 'Получается дешёвая радость. Не пять минут рилсов, а ощущение, что день прошёл не зря.'],
+        ['25-33 с', 'Через неделю покажу, сработало ли. Хочешь такое же? Напиши «хочу» в комментариях.']
+      ],
+      shots: [
+        'Тот же ракурс и свет, что в V1, чтобы серия выглядела цельно.',
+        'Запись экрана iPhone: открываешь приложение и ставишь галочку, 6-7 секунд.',
+        'Крупно палец на галочке, замедление x0.5.',
+        'Финал в кадре: кивок в камеру, пауза 1 секунда.'
+      ],
+      cover: { text: 'ГАЛОЧКА', frame: 'Скриншот приложения с двумя отмеченными задачами, сверху слово.' },
+      montage: ['Запись экрана вставь на 5-7 секунд поверх речи (слой «Наложение»), звук речи не обрывай.'],
+      caption: 'Сделал приложение, которое отучает тупить в рилсах. Хочешь такое же? Пиши «хочу».',
+      tags: '#мозг #привычки #продуктивность #саморазвитие #влог'
+    },
+    {
+      id: 3, fmt: 'Дома или в машине', title: 'Телефон против камеры ночью', post: 5, time: '20:00', len: '30-40 с',
+      idea: 'Одна и та же сцена на iPhone 17 и на Sony с объективом 1.2. Говори только то, что реально видишь на записи.',
+      hook: 'Снял одно и то же на iPhone 17 и на камеру. Ночью разница видна сразу.',
+      script: [
+        ['0-3 с', 'Снял одно и то же на iPhone 17 и на камеру. Ночью разница видна сразу.'],
+        ['3-10 с', 'Слева iPhone 17. Справа Sony с объективом 1.2.'],
+        ['10-22 с', 'Смотри на тёмные места: [опиши, что реально видишь: шум, резкость, фон, огни].'],
+        ['22-35 с', 'Зато телефон удобнее: достал и снял. Для быстрых рилсов беру телефон, для красивых кадров камеру.']
+      ],
+      shots: [
+        'Сцена: ночная улица за окном или огни через лобовое. Две записи подряд из одной точки.',
+        'Предмет на столе (кружка, часы) при одной лампе. Тоже на обе камеры.',
+        'iPhone: 4K 30 к/с, обычное приложение «Камера».',
+        'Sony: 4K 25p, S-Cinetone, диафрагма 1.4, ISO авто до 3200, выдержка 1/50.',
+        'Хлопни в ладоши в начале каждой записи, чтобы синхронизировать при монтаже.'
+      ],
+      cover: { text: 'ТЕЛЕФОН vs КАМЕРА', frame: 'Кадр пополам: слева iPhone, справа Sony, один и тот же объект.' },
+      montage: ['Два видео друг на друга: «Наложение» + разделение пополам. Подписи «iPhone» и «Sony» маленьким шрифтом сверху.', 'Синхронизируй по хлопку.'],
+      caption: 'iPhone 17 или камера ночью? Снял одно и то же. Какой кадр лучше?',
+      tags: '#sony #iphone17 #ночь #сравнение #камера'
+    },
+    {
+      id: 4, fmt: 'Игра (проверка для стрима)', title: 'Новичок в популярной игре', post: 7, time: '22:00', len: '25-30 с',
+      idea: 'Выбери одну популярную игру, в которую ни разу не играл. Записываешь экран и голос. Это тест: нравится ли тебе говорить, пока играешь. От ответа зависит, идти ли в стримы.',
+      hook: 'Первый раз в жизни зашёл в эту игру. Сколько продержусь?',
+      script: [
+        ['0-3 с', 'Первый раз в жизни зашёл в [название игры]. Сколько продержусь?'],
+        ['3-20 с', 'Играешь и комментируешь вслух: «Так, что это? Куда жать? Нет-нет-нет». Оставь самые живые 15 секунд.'],
+        ['20-28 с', 'Итог: [результат]. Продолжить? Пиши в комментариях.']
+      ],
+      shots: [
+        'Запись экрана игры (iPhone: «Запись экрана» или ПК).',
+        'Голос: Boya на камеру или Zoom H1 рядом с ртом, на 15-20 см.',
+        'По желанию: лицо в углу, Sony на штативе с мягким светом сбоку.'
+      ],
+      cover: { text: 'ПЕРВЫЙ РАЗ', frame: 'Эмоциональный момент: проигрыш или удивление, лицо крупно.' },
+      montage: ['Вырезай всё, где нет эмоции. Субтитры на каждую реплику.', 'Если лицо в углу, ставь его в нижнюю треть слева, на кнопки TikTok не залезай.'],
+      caption: 'Первый раз в этой игре. Сколько продержался? Играть дальше?',
+      tags: '#игры #новичок #первыйраз #геймер #влог'
+    },
+    {
+      id: 5, fmt: 'Дома', title: 'День 1 без рилсов', post: 8, time: '20:00', len: '20-30 с',
+      idea: 'Начало недельного эксперимента: 7 дней не листаешь ленту. Заходишь в TikTok только чтобы загрузить видео.',
+      hook: 'Семь дней не листаю рилсы. Сегодня первый. Страшно.',
+      script: [
+        ['0-3 с', 'Семь дней не листаю рилсы. Сегодня первый. Страшно.'],
+        ['3-12 с', 'Раньше на ленту уходило [N] часов в день. Вот скриншот.'],
+        ['12-22 с', 'Правило такое: захожу только чтобы загрузить видео. Ленту не открываю. Вместо неё делаю 4 задачи из приложения.'],
+        ['22-28 с', 'Каждый день отмечаю, как себя чувствую. Через неделю покажу итог.']
+      ],
+      shots: [
+        'Запись экрана: Настройки, Экранное время, график за неделю. Подставь свою цифру.',
+        'Телефон экраном вниз на столе, 3 секунды.',
+        'Тебя говорящим: дома у окна или рядом с лампой, мягкий свет сбоку.'
+      ],
+      cover: { text: '7 ДНЕЙ БЕЗ РИЛСОВ', frame: 'Телефон экраном вниз на столе, лампа сбоку, тёмный фон.' },
+      montage: ['Скриншот экранного времени держи на экране 3 секунды, цифру обведи.'],
+      caption: 'Эксперимент: 7 дней без рилсов. День 1.',
+      tags: '#челлендж #безрилсов #дофамин #привычки #эксперимент'
+    },
+    {
+      id: 6, fmt: 'Машина, ночь', title: 'Ночь. Город. Без людей', post: 10, time: '22:00', len: '20-30 с',
+      idea: 'Красивые ночные кадры и твой голос за кадром. Людей в кадре нет, так проще и спокойнее с правами.',
+      hook: 'Ночью город другой.',
+      script: [
+        ['0-3 с', 'Ночью город другой.'],
+        ['3-15 с', 'Пустые дороги, жёлтый свет, ни одной души. Вот здесь я и снимаю.'],
+        ['15-25 с', 'Всё снято на Sony с объективом 1.2. Ночью он вытягивает огни.'],
+        ['25-30 с', 'Подпишись, будет больше ночи.']
+      ],
+      shots: [
+        'Огни дороги через лобовое: фокус на фонарях, чтобы получились круглые блики (боке).',
+        'Светофор или вывеска крупно, 3 секунды.',
+        'iPhone на DJI OM SE: идёшь вдоль фонарей без людей в кадре, 6 секунд.',
+        'Подсвеченная панель машины крупно.',
+        'Длинный кадр пустой улицы, 5 секунд без движения камеры.',
+        'Настройки Sony: 25p, 1/50, диафрагма 1.4-2, ISO до 3200.'
+      ],
+      cover: { text: 'НОЧЬ', frame: 'Пустая дорога с фонарями, огни размыты. Слово одно, внизу мелко.' },
+      montage: ['Закадровый голос запиши на Zoom H1 в тихой машине, потом положи под кадры.', 'Кадры по 2-3 секунды, на музыку, без субтитров или с минимальными.'],
+      caption: 'Ночью город другой. Снято на Sony.',
+      tags: '#ночь #город #кинематограф #sony #беларусь'
+    },
+    {
+      id: 7, fmt: 'Дома или в машине', title: 'Что дали первые 6 видео', post: 12, time: '20:00', len: '30-40 с',
+      idea: 'Показываешь реальные цифры из раздела «Прогресс». Зрителям нравится честность, а тебе помогает увидеть, что работает.',
+      hook: 'Я выложил 6 видео. Вот сколько просмотров они дали.',
+      script: [
+        ['0-3 с', 'Я выложил шесть видео. Вот сколько просмотров они дали.'],
+        ['3-15 с', 'Лучшее: [название], [просмотры]. Худшее: [название], [просмотры].'],
+        ['15-28 с', 'Что я понял: [один вывод: на какой секунде уходят, какой хук работал].'],
+        ['28-35 с', 'Дальше делаю больше того, что зашло. Подпишись.']
+      ],
+      shots: [
+        'Скриншот статистики TikTok для лучшего и худшего видео.',
+        'Ты в кадре в машине или дома, свет как в V1.',
+        'Цифры крупно текстом на экране.'
+      ],
+      cover: { text: 'ПЕРВЫЕ ЦИФРЫ', frame: 'Скриншот статистики с обведённой цифрой, твоё лицо сбоку.' },
+      montage: ['Цифры показывай крупным текстом, анимация «Появление», чтобы взгляд цеплялся.'],
+      caption: 'Первые цифры за 12 дней. Что зашло, что нет.',
+      tags: '#статистика #тикток #цифры #рост #влог'
+    },
+    {
+      id: 8, fmt: 'Дома', title: 'Итог 7 дней без рилсов', post: 14, time: '21:00', len: '35-45 с',
+      idea: 'Финал недельного эксперимента: цифры до и после и честный вывод.',
+      hook: '7 дней без рилсов закончились. Вот что изменилось.',
+      script: [
+        ['0-3 с', 'Семь дней без рилсов закончились. Вот что изменилось.'],
+        ['3-15 с', 'Экранное время было [N], стало [N]. Задач закрыл [N] из 56. Видео выложил [N].'],
+        ['15-30 с', 'Что почувствовал: [честно, что было тяжело, что стало легче].'],
+        ['30-40 с', 'Продолжу ли я: [да или нет, почему]. Дальше будет больше экспериментов.']
+      ],
+      shots: [
+        'Запись экрана: Экранное время «до» (V5) и «после».',
+        'Приложение с отмеченными задачами.',
+        'Ты в кадре, спокойно, без монтажных зумов на самых честных фразах.'
+      ],
+      cover: { text: '7 ДНЕЙ. ИТОГ', frame: 'Экран с цифрой «до» и «после» рядом, лицо сбоку.' },
+      montage: ['Цифры «до» и «после» покажи как два числа рядом.'],
+      caption: 'Итог 7 дней без рилсов. Цифры и честный вывод.',
+      tags: '#челлендж #итоги #безрилсов #привычки #эксперимент'
+    }
+  ];
+
+  var DAYS = [
+    { t: 'Настройка и ночная съёмка', vids: [1, 2], tasks: [
+      ['v', 'Настроить Sony: 4K 25p, S-Cinetone, выдержка 1/50, ISO авто до 3200. Снять тест 30 секунд в машине ночью.'],
+      ['v', 'Снять ночью в машине сцены для V1 и V2 (план в карточках). Говорящие кадры только на стоянке.'],
+      ['g', 'Создать TikTok, Instagram и YouTube с одним именем и фото.'],
+      ['s', 'Придумать и записать 5 вариантов первой фразы для видео (10 минут).']
+    ]},
+    { t: 'Первый ролик', vids: [1], tasks: [
+      ['v', 'Смонтировать V1 в CapCut по шаблону (около часа).'],
+      ['v', 'Опубликовать V1 в 20:00 в TikTok, Reels и Shorts.'],
+      ['g', 'Первый час после публикации отвечать на все комментарии.'],
+      ['s', '20 минут: найти популярный ролик в твоём формате и выписать, на какой секунде меняется кадр.']
+    ]},
+    { t: 'Мозг любит галочки', vids: [2], tasks: [
+      ['v', 'Смонтировать V2 и записать экран приложения (6-7 секунд).'],
+      ['v', 'Опубликовать V2 в 22:00.'],
+      ['g', 'Посмотреть статистику V1: сколько человек досмотрели до конца. Записать цифру.'],
+      ['m', '15 минут: в справке TikTok и YouTube узнать, как монетизация работает для Беларуси. Записать выводы.']
+    ]},
+    { t: 'Съёмка сравнения', vids: [3], tasks: [
+      ['v', 'Снять сравнение iPhone и Sony: одна сцена, одна точка, ночью (V3), около 40 минут.'],
+      ['v', 'Записать 3 запасных кадра огней дороги на стоянке (10 минут).'],
+      ['s', '20 минут: освоить в CapCut три приёма: наложение, автосубтитры, замедление.'],
+      ['g', 'Подписаться на 10 каналов своего формата (машина, ночь, влог) и записать, что у них заходит.']
+    ]},
+    { t: 'Телефон против камеры', vids: [3], tasks: [
+      ['v', 'Смонтировать V3 (наложение двух видео, около часа).'],
+      ['v', 'Опубликовать V3 в 20:00.'],
+      ['g', 'Ответить на комментарии и сохранить 3 вопроса зрителей как идеи для видео.'],
+      ['m', 'Выяснить, как легально получать доход от рекламы в РБ (налоги, регистрация). Записать вопросы и принести в чат.']
+    ]},
+    { t: 'Первый тест игры', vids: [4], tasks: [
+      ['v', 'Выбрать одну популярную игру, в которую не играл, и установить.'],
+      ['v', 'Записать 15 минут игры с голосом (Boya или Zoom H1) без подготовки.'],
+      ['s', '20 минут: послушать запись и отметить, где было интересно, а где скучно.'],
+      ['g', 'Придумать 10 хуков для будущих роликов (по одному предложению).']
+    ]},
+    { t: 'Игровой ролик', vids: [4], tasks: [
+      ['v', 'Смонтировать V4 из лучших 25 секунд записи.'],
+      ['v', 'Опубликовать V4 в 22:00.'],
+      ['g', 'Разобрать статистику V1-V3: какое видео набрало больше и почему.'],
+      ['s', '15 минут: ответить себе письменно, нравится ли говорить на камеру во время игры. Да или нет и почему.']
+    ]},
+    { t: 'Старт: 7 дней без рилсов', vids: [5], tasks: [
+      ['v', 'Записать экран «Экранное время» за прошлую неделю.'],
+      ['v', 'Снять и смонтировать V5, опубликовать в 20:00.'],
+      ['g', 'Весь день не открывать ленту рилсов. Заходить только чтобы загрузить видео.'],
+      ['s', '30 минут: посмотреть полезный урок по монтажу, речи или съёмке и записать 3 вывода.']
+    ]},
+    { t: 'Ночные кадры для V6', vids: [6], tasks: [
+      ['v', 'Вечером выехать на место с видом на огни и снять 5 кадров для V6.'],
+      ['v', 'Снять на iPhone с DJI OM SE: идёшь вдоль фонарей, людей в кадре нет.'],
+      ['g', 'Записать в заметке одной строкой, как себя чувствуешь без рилсов.'],
+      ['s', '20 минут: подобрать музыку для V6 (спокойная, без вокала).']
+    ]},
+    { t: 'Ночь. Город', vids: [6], tasks: [
+      ['v', 'Записать закадровый голос для V6 на Zoom H1 в тихой машине.'],
+      ['v', 'Смонтировать V6 и опубликовать в 22:00.'],
+      ['g', 'Сравнить просмотры V6 с остальными видео и записать цифру в «Прогрессе».'],
+      ['m', '20 минут: найти 10 каналов твоего размера с рекламой и записать, как они её продают.']
+    ]},
+    { t: 'Разбор недели', vids: [], tasks: [
+      ['g', 'Внести просмотры всех видео в раздел «Прогресс».'],
+      ['s', '30 минут: выбрать один формат из трёх (машина, дом, игра), который нравится тебе и дал больше просмотров.'],
+      ['v', 'Снять 2 запасных видео в выбранном формате.'],
+      ['m', 'Записать 3 идеи, чем ты можешь быть полезен местной рекламе. Письменно, без личных встреч.']
+    ]},
+    { t: 'Первые цифры', vids: [7], tasks: [
+      ['v', 'Снять и смонтировать V7 с цифрами из раздела «Прогресс».'],
+      ['v', 'Опубликовать V7 в 20:00.'],
+      ['g', 'Ответить всем комментаторам и спросить, что снимать дальше.'],
+      ['s', '20 минут: в статистике TikTok найти удержание у самого слабого видео и записать, на какой секунде уходят.']
+    ]},
+    { t: 'Подготовка итога', vids: [8], tasks: [
+      ['v', 'Снять недостающие кадры для V8: приложение, экранное время «после».'],
+      ['g', 'Составить план роликов на следующие 14 дней: 3 темы на формат, который зашёл.'],
+      ['s', '30 минут: придумать 5 разных концовок с призывом подписаться и выбрать лучшую.'],
+      ['m', 'Написать короткое описание профиля: кто ты и что снимаешь. Пригодится рекламодателям.']
+    ]},
+    { t: 'Итоги недели', vids: [8], tasks: [
+      ['v', 'Смонтировать V8 и опубликовать в 21:00.'],
+      ['g', 'Внести свежие цифры в «Прогресс» и записать 3 вывода.'],
+      ['s', 'Решить: продолжаем два формата или меняем направление. Записать решение.'],
+      ['m', 'Вернуться в чат со списком выводов и попросить план на следующие 14 дней.']
+    ]}
+  ];
+
+  var PHASES = [
+    { from: Date.UTC(2026, 10, 21), to: Date.UTC(2026, 11, 31), name: 'Основа', d: '21 ноя - 31 дек', text: 'Найти формат, который заходит, и привыкнуть снимать каждый день. Цель: 30 и больше роликов.' },
+    { from: Date.UTC(2027, 0, 1), to: Date.UTC(2027, 0, 31), name: 'Рост', d: '1 - 31 янв', text: 'Делать больше того, что зашло. Ритм: видео каждый день. Первые пробные стримы.' },
+    { from: Date.UTC(2027, 1, 1), to: Date.UTC(2027, 1, 28), name: 'Деньги', d: '1 - 28 фев', text: 'Предлагать рекламу в видео письменно, собрать профиль и цифры для рекламодателей.' }
+  ];
+
+  /* хранилище: сбой хранилища не ломает страницу */
+  var KEY = 'kurs1000:v1';
+  var state = { checks: {}, vstat: {}, views: {} };
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var p = JSON.parse(raw); state.checks = p.checks || {}; state.vstat = p.vstat || {}; state.views = p.views || {}; }
+  } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  function todayUTC() { var n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); }
+  function planDay() { return Math.floor((todayUTC() - START) / DAY) + 1; }
+  function clampDay(n) { return Math.min(PLAN_DAYS, Math.max(1, n)); }
+  function daysLeft() { return Math.max(0, Math.round((GOAL - todayUTC()) / DAY)); }
+  function dayDone(n) { var d = DAYS[n - 1]; return d.tasks.every(function (_, i) { return state.checks[n + '-' + i]; }); }
+  function dayCount(n) { var d = DAYS[n - 1], c = 0; d.tasks.forEach(function (_, i) { if (state.checks[n + '-' + i]) c++; }); return c; }
+  function streak() {
+    var cur = Math.min(planDay(), PLAN_DAYS), s = 0;
+    if (cur < 1) return 0;
+    for (var n = cur; n >= 1; n--) {
+      if (dayDone(n)) s++;
+      else if (n !== cur) break;
+    }
+    return s;
+  }
+  function dateLabel(n) {
+    return new Date(START + (n - 1) * DAY).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+  }
+  function videoById(id) { return VIDEOS.filter(function (v) { return v.id === id; })[0]; }
+  function vs(id) { return state.vstat[id] || {}; }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function hero(n) {
+    var digits = String(daysLeft()).split('').map(function (d) { return '<span class="dg">' + d + '</span>'; }).join('');
+    var ring = '';
+    if (n) {
+      var total = DAYS[n - 1].tasks.length, done = dayCount(n), off = (113.1 * (1 - done / total)).toFixed(1);
+      ring = '<div class="ring" role="img" aria-label="Выполнено задач"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="rt" cx="22" cy="22" r="18"/><circle class="rf" id="ringfill" cx="22" cy="22" r="18" stroke-dasharray="113.1" stroke-dashoffset="' + off + '"/></svg><b id="ringtxt">' + done + '/' + total + '</b></div>';
+    }
+    return '<section class="hero"><div class="hero-top"><span class="hero-label">До 01.03.2027</span><span class="hchip">серия ' + streak() + '</span></div><div class="hero-main"><div class="digits">' + digits + '<span class="unit">дней</span></div>' + ring + '</div></section>';
+  }
+  function dots(id) {
+    var s = vs(id);
+    return '<span class="dots" aria-hidden="true"><i class="' + (s.shot ? 'on' : '') + '"></i><i class="' + (s.edit ? 'on' : '') + '"></i><i class="' + (s.posted ? 'on' : '') + '"></i></span>';
+  }
+  function vidLink(v) {
+    return '<a class="vidlink k' + (v.id % 3) + '" href="#video-' + v.id + '"><span class="vn">V' + v.id + '</span><span class="t"><b>' + esc(v.title) + '</b><span>' + esc(v.fmt) + ' · день ' + v.post + ', ' + v.time + '</span></span>' + dots(v.id) + '<span class="go" aria-hidden="true">›</span></a>';
+  }
+
+  function viewToday(n) {
+    var cur = planDay(), d = DAYS[n - 1];
+    var strip = DAYS.map(function (_, i) {
+      var k = i + 1, dt = new Date(START + i * DAY);
+      return '<a class="dchip' + (k === n ? ' on' : '') + (dayDone(k) ? ' done' : '') + '" id="dc-' + k + '" href="#day-' + k + '"' + (k === n ? ' aria-current="true"' : '') + '><small>' + dt.toLocaleDateString('ru-RU', { weekday: 'short', timeZone: 'UTC' }).replace('.', '') + '</small><b>' + dt.getUTCDate() + '</b></a>';
+    }).join('');
+    var chips = '<span class="chip accent">День ' + n + ' из ' + PLAN_DAYS + '</span>';
+    if (n === cur) chips += '<span class="chip">сегодня</span>';
+    if (n > cur) chips += '<span class="chip">впереди</span>';
+    var tasks = d.tasks.map(function (t, i) {
+      var id = n + '-' + i, on = !!state.checks[id];
+      return '<label class="task' + (on ? ' done' : '') + '"><input type="checkbox" data-task="' + id + '"' + (on ? ' checked' : '') + '><span class="txt"><span class="tag ' + t[0] + '">' + TAGS[t[0]] + '</span><span class="body">' + esc(t[1]) + '</span></span></label>';
+    }).join('');
+    var vids = d.vids.length ? '<div class="stack"><h3>Видео этого дня</h3>' + d.vids.map(function (id) { return vidLink(videoById(id)); }).join('') + '</div>' : '';
+    var over = cur > PLAN_DAYS && n === PLAN_DAYS ? '<div class="card flat small">План на 14 дней закончился. Вернись в чат и попроси следующие 14 дней: я подстрою их под твои цифры.</div>' : '';
+    return hero(n) + '<div class="days" id="days">' + strip + '</div>' +
+      '<div class="daytitle"><div class="date">' + dateLabel(n) + '</div><h2>' + esc(d.t) + '</h2><div class="meta">' + chips + '</div></div>' +
+      '<div class="tasks">' + tasks + '</div>' + vids + over;
+  }
+
+  function viewVideos() {
+    return '<div class="stack"><h2>Видео</h2><p class="muted small">Восемь роликов на первые 14 дней. Внутри каждого: текст, кадры, обложка, монтаж, описание.</p></div>' +
+      '<div class="stack">' + VIDEOS.map(vidLink).join('') + '</div>' +
+      '<details class="card"><summary>Шаблон монтажа для любого видео</summary><ol class="list">' + MONTAGE_BASE.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ol></details>';
+  }
+
+  function viewVideo(id) {
+    var v = videoById(id);
+    if (!v) return viewVideos();
+    var s = vs(id);
+    function st(key, label) { return '<label><input type="checkbox" data-vs="' + id + ':' + key + '"' + (s[key] ? ' checked' : '') + '>' + label + '</label>'; }
+    return '<a class="back" href="#videos">‹ Все видео</a>' +
+      '<div class="stack"><h2>V' + v.id + '. ' + esc(v.title) + '</h2>' +
+      '<div class="meta"><span class="chip">' + esc(v.fmt) + '</span><span class="chip">день ' + v.post + ', ' + v.time + '</span><span class="chip">' + v.len + '</span></div></div>' +
+      '<div class="statuses">' + st('shot', 'Снято') + st('edit', 'Смонтировано') + st('posted', 'Опубликовано') + '</div>' +
+      '<div class="card sec"><h3>Идея</h3><p>' + esc(v.idea) + '</p></div>' +
+      '<div class="card sec"><h3>Хук, первые 3 секунды</h3><p class="hook">' + esc(v.hook) + '</p></div>' +
+      '<div class="card sec"><h3>Что говорить</h3><ol class="script" id="sc-' + id + '">' + v.script.map(function (l) { return '<li><span class="tc">' + l[0] + '</span><span class="tx">' + esc(l[1]) + '</span></li>'; }).join('') + '</ol><button class="btn ghost" type="button" data-copy="' + id + '">Скопировать текст</button></div>' +
+      '<div class="card sec"><h3>Кадры и ракурсы</h3><ul class="list">' + v.shots.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+      '<div class="card sec"><h3>Обложка</h3><div class="coverbox"><div class="big">' + esc(v.cover.text) + '</div><p class="small muted">' + esc(v.cover.frame) + '</p></div></div>' +
+      '<div class="card sec"><h3>Монтаж</h3><ul class="list">' + v.montage.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '<li>Остальное по шаблону: <a href="#videos">общий список шагов</a>.</li></ul></div>' +
+      '<div class="card sec"><h3>Описание и теги</h3><p>' + esc(v.caption) + '</p><p class="muted small" style="margin-top:8px">' + esc(v.tags) + '</p></div>' +
+      '<div class="card sec"><h3>Публикация</h3><p>День ' + v.post + ' (' + dateLabel(v.post) + '), в ' + v.time + '. Выкладывай одновременно в TikTok, Reels и Shorts. Время 20:00 и 22:00 чередуются специально: так увидим, какое работает лучше.</p></div>';
+  }
+
+  function viewProgress() {
+    var cur = planDay(), totalTasks = DAYS.reduce(function (a, d) { return a + d.tasks.length; }, 0), doneTasks = 0;
+    DAYS.forEach(function (d, di) { d.tasks.forEach(function (_, i) { if (state.checks[(di + 1) + '-' + i]) doneTasks++; }); });
+    var posted = VIDEOS.filter(function (v) { return vs(v.id).posted; }).length;
+    var today = todayUTC();
+    var phases = PHASES.map(function (p) {
+      var now = today >= p.from && today <= p.to;
+      return '<div class="phase' + (now ? ' now' : '') + '"><span class="pd">' + p.d + '</span><div><div class="pn">' + p.name + (now ? ' · сейчас' : '') + '</div><p class="small muted">' + p.text + '</p></div></div>';
+    }).join('');
+    var sum = 0, best = null;
+    VIDEOS.forEach(function (v) { var n = Number(state.views[v.id]); if (n > 0) { sum += n; if (!best || n > Number(state.views[best.id])) best = v; } });
+    var rows = VIDEOS.map(function (v) {
+      var val = state.views[v.id] != null && state.views[v.id] !== '' ? state.views[v.id] : '';
+      return '<div class="viewrow"><span class="vt"><b>V' + v.id + '</b> ' + esc(v.title) + '</span><input type="number" inputmode="numeric" min="0" id="views-' + v.id + '" data-views="' + v.id + '" value="' + val + '" placeholder="0" aria-label="Просмотры V' + v.id + '"></div>';
+    }).join('');
+    return '<h2>Прогресс</h2>' + hero(null) +
+      '<div class="stats"><div class="stat"><b>' + streak() + '</b><span>дней подряд</span></div><div class="stat"><b>' + doneTasks + '/' + totalTasks + '</b><span>задач</span></div><div class="stat"><b>' + posted + '/' + VIDEOS.length + '</b><span>видео</span></div></div>' +
+      '<div class="card"><h3 style="margin-bottom:6px">Этапы до 01.03.2027</h3>' + phases + '</div>' +
+      '<div class="card"><h3 style="margin-bottom:6px">Просмотры по видео</h3>' + rows +
+      '<p class="small muted" style="margin-top:10px" id="viewsum">' + (sum ? 'Всего: ' + sum.toLocaleString('ru-RU') + '. Лучшее: V' + best.id + '.' : 'Введи цифры из TikTok, и здесь появится лучшее видео.') + '</p></div>' +
+      '<p class="small muted">Цель в 1000 долларов это ориентир, а не прогноз. Сейчас главное: каждый день выпускать видео и смотреть на цифры.</p>';
+  }
+
+  var app = document.getElementById('app'), tabs = document.getElementById('tabs');
+  var ICONS = {
+    today: '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>',
+    videos: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z"/></svg>',
+    progress: '<svg viewBox="0 0 24 24"><path d="M4 19V10M10 19V5M16 19v-7M21 19H3"/></svg>'
+  };
+
+  function render() {
+    var h = location.hash.slice(1), m, tab = 'today', html;
+    if ((m = h.match(/^day-(\d+)$/))) html = viewToday(clampDay(parseInt(m[1], 10)));
+    else if ((m = h.match(/^video-(\d+)$/))) { tab = 'videos'; html = viewVideo(parseInt(m[1], 10)); }
+    else if (h === 'videos') { tab = 'videos'; html = viewVideos(); }
+    else if (h === 'progress') { tab = 'progress'; html = viewProgress(); }
+    else html = viewToday(clampDay(planDay()));
+    app.innerHTML = html;
+    var dcs = document.getElementById('days'), sel = dcs && dcs.querySelector('.on');
+    if (sel) dcs.scrollLeft = sel.offsetLeft - (dcs.clientWidth - sel.offsetWidth) / 2;
+    var cur = clampDay(planDay());
+    tabs.innerHTML = [['today', '#day-' + cur, 'Сегодня'], ['videos', '#videos', 'Видео'], ['progress', '#progress', 'Прогресс']].map(function (t) {
+      return '<a href="' + t[1] + '" class="' + (t[0] === tab ? 'on' : '') + '"' + (t[0] === tab ? ' aria-current="page"' : '') + '>' + ICONS[t[0]] + t[2] + '</a>';
+    }).join('');
+  }
+
+  app.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.matches('input[data-task]')) {
+      var key = t.getAttribute('data-task');
+      if (t.checked) state.checks[key] = 1; else delete state.checks[key];
+      save();
+      t.closest('.task').classList.toggle('done', t.checked);
+      var n = parseInt(key.split('-')[0], 10), total = DAYS[n - 1].tasks.length, done = dayCount(n);
+      var rf = document.getElementById('ringfill'); if (rf) rf.setAttribute('stroke-dashoffset', (113.1 * (1 - done / total)).toFixed(1));
+      var rt = document.getElementById('ringtxt'); if (rt) rt.textContent = done + '/' + total;
+      var dcc = document.getElementById('dc-' + n); if (dcc) dcc.classList.toggle('done', done === total);
+    } else if (t.matches('input[data-vs]')) {
+      var p = t.getAttribute('data-vs').split(':');
+      state.vstat[p[0]] = state.vstat[p[0]] || {};
+      state.vstat[p[0]][p[1]] = t.checked;
+      save();
+    } else if (t.matches('input[data-views]')) {
+      var id = t.getAttribute('data-views');
+      if (t.value === '') delete state.views[id]; else state.views[id] = Math.max(0, parseInt(t.value, 10) || 0);
+      save();
+      render();
+    }
+  });
+
+  app.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy]');
+    if (!b) return;
+    var id = parseInt(b.getAttribute('data-copy'), 10), v = videoById(id);
+    var text = v.script.map(function (l) { return l[1]; }).join('\n');
+    function fallback() {
+      var el = document.getElementById('sc-' + id), r = document.createRange();
+      r.selectNodeContents(el);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      b.textContent = 'Выделено, нажми «Копировать»';
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { b.textContent = 'Скопировано'; }, fallback);
+    } catch (err) { fallback(); }
+  });
+
+  window.addEventListener('hashchange', function () { render(); window.scrollTo(0, 0); });
+  render();
+})();
+</script>
+
+</body>
+</html>
